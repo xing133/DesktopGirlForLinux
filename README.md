@@ -168,3 +168,14 @@ Common options:
 - **Background removal**: [backgroundremover](https://github.com/nadermx/backgroundremover) (U2Net human_seg) processes each frame and outputs an RGBA PNG sequence
 - **Display**: Transparent window via GTK3 RGBA visual, Cairo per-frame rendering, GLib timer-driven animation
 - **Click-through**: `input_shape_combine_region` updated per frame so transparent pixels never intercept mouse events
+
+
+## 效果展示
+
+![screenshot 1](screenshot/dd1.png)
+![screenshot 2](screenshot/dd2.png)
+![screenshot 3](screenshot/dd3.png)
+
+
+
+
