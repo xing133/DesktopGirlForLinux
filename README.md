@@ -53,13 +53,14 @@ uv pip install --python .venv/bin/python -r requirements.txt \
 desktop-dancer/
 ├── remove_bg.py      # 阶段1：AI 抠图，生成透明帧序列
 ├── dancer.py         # 阶段2：GTK 透明窗口播放
-├── dancer/           # 角色目录
-│   ├── .last         # 记录上次使用的角色（自动生成）
-│   ├── anna01/       # 一个角色
+├── dancer/                # 角色目录（每个子目录 = 一个角色）
+│   ├── .last              # 记录上次使用的角色（自动生成）
+│   ├── yuna-233/          # 角色示例
 │   │   ├── metadata.json
 │   │   ├── frame_0001.png
 │   │   └── ...
-│   └── alyx2/        # 另一个角色
+│   ├── yuna-chrismas/     # 角色示例
+│   └── 春丽-yourbody/      # 角色示例（支持中文目录名）
 └── docs/
     └── backgroundremover.md
 ```
@@ -70,13 +71,14 @@ desktop-dancer/
 desktop-dancer/
 ├── remove_bg.py      # Phase 1: AI background removal, generates transparent frame sequence
 ├── dancer.py         # Phase 2: GTK transparent window player
-├── dancer/           # Character directory
-│   ├── .last         # Last used character (auto-generated)
-│   ├── anna01/       # A character
+├── dancer/                # Character directory (each subfolder = one character)
+│   ├── .last              # Last used character (auto-generated)
+│   ├── yuna-233/          # Example character
 │   │   ├── metadata.json
 │   │   ├── frame_0001.png
 │   │   └── ...
-│   └── alyx2/        # Another character
+│   ├── yuna-chrismas/     # Example character
+│   └── 春丽-yourbody/      # Example character (non-English names are supported)
 └── docs/
     └── backgroundremover.md
 ```
