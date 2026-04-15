@@ -4,7 +4,7 @@
 
 用法：
   .venv/bin/python remove_bg.py
-  .venv/bin/python remove_bg.py --display-height 600 --overwrite
+  .venv/bin/python remove_bg.py --display-height 800 --overwrite
 """
 
 import argparse
@@ -22,7 +22,7 @@ def parse_args():
     p = argparse.ArgumentParser(description="视频背景去除")
     p.add_argument("--input", default="jean.mp4", help="输入视频文件")
     p.add_argument("--frames-dir", default="dancer/jean", help="输出帧目录（建议格式：dancer/<角色名>）")
-    p.add_argument("--display-height", default=450, type=int,
+    p.add_argument("--display-height", default=800, type=int,
                    help="输出帧高度（像素），宽度按比例缩放")
     p.add_argument("--model", default="u2net_human_seg",
                    choices=["u2net", "u2net_human_seg", "u2netp"],

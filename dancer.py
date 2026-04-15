@@ -21,6 +21,7 @@
 import argparse
 import json
 import random
+import subprocess
 import sys
 import threading
 from pathlib import Path
@@ -302,6 +303,12 @@ class DancerWindow(Gtk.Window):
 
         menu.append(Gtk.SeparatorMenuItem())
 
+        add_wife_item = Gtk.MenuItem(label="添加老婆（调试）")
+        add_wife_item.connect("activate", self._open_add_wife_debug)
+        menu.append(add_wife_item)
+
+        menu.append(Gtk.SeparatorMenuItem())
+
         quit_item = Gtk.MenuItem(label="退出舞者")
         quit_item.connect("activate", lambda _: Gtk.main_quit())
         menu.append(quit_item)
@@ -430,6 +437,17 @@ class DancerWindow(Gtk.Window):
             self._random_every_loops = int(spin.get_value())
             self._loops_since_switch = 0
         dialog.destroy()
+
+    def _open_add_wife_debug(self, _item):
+        root = Path(__file__).resolve().parent
+        main_py = root / "main.py"
+        try:
+            subprocess.Popen(
+                [sys.executable, str(main_py), "--open-add-wife-only"],
+                cwd=str(root),
+            )
+        except Exception as e:
+            print(f"打开添加老婆窗口失败：{e}")
 
     def _pick_random_name(self) -> str | None:
         names = [d.name for d in get_dancer_subdirs(self._dancer_dir)]

@@ -1,3 +1,4 @@
 backgroundremover
 PyGObject<3.50
 pycairo
+PySide6
