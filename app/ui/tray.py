@@ -29,12 +29,16 @@ class DesktopDancerTray:
         self._tray = QSystemTrayIcon(icon)
         self._tray.setToolTip("Desktop Dancer")
 
-        # Linux / macOS 走 Qt 菜单（Windows 走 Win32 原生菜单，见下方）
+        # Linux / macOS use Qt's tray menu path.
+        # On Windows, this app runs as a tray-only process without a normal active main window.
+        # QSystemTrayIcon.setContextMenu() reaches aboutToShow, but the popup never becomes visible,
+        # so Windows keeps a native TrackPopupMenu-based tray menu here.
         self._menu = QMenu()
         add_wife_action = QAction("添加一个老婆")
         add_wife_action.triggered.connect(on_add_wife)
         self._menu.addAction(add_wife_action)
         self._menu.addSeparator()
+
         quit_action = QAction("退出")
         quit_action.triggered.connect(on_quit)
         self._menu.addAction(quit_action)
@@ -57,31 +61,34 @@ class DesktopDancerTray:
 
     def _show_menu_win32(self) -> None:
         """
-        Win32 标准 tray 菜单模式：
+        Standard Win32 tray popup flow:
           SetForegroundWindow(tray_msg_hwnd)
-          TrackPopupMenu(...)          ← 阻塞，内置消息循环，不受 Qt popup 干扰
-          PostMessage(WM_NULL)         ← 通知 shell 事件已处理完毕
+          TrackPopupMenu(...)
+          PostMessage(WM_NULL)
         """
         import ctypes
 
-        user32  = ctypes.windll.user32
-        pos     = QCursor.pos()
+        user32 = ctypes.windll.user32
+        pos = QCursor.pos()
         tray_hwnd = self._find_qt_tray_hwnd()
 
-        # 构造原生 Win32 弹出菜单
         hmenu = user32.CreatePopupMenu()
-        user32.AppendMenuW(hmenu, 0x0,   1, "添加一个老婆")  # MF_STRING
-        user32.AppendMenuW(hmenu, 0x800, 0, None)            # MF_SEPARATOR
-        user32.AppendMenuW(hmenu, 0x0,   2, "退出")          # MF_STRING
+        user32.AppendMenuW(hmenu, 0x0, 1, "添加一个老婆")  # MF_STRING
+        user32.AppendMenuW(hmenu, 0x800, 0, None)  # MF_SEPARATOR
+        user32.AppendMenuW(hmenu, 0x0, 2, "退出")  # MF_STRING
 
         if tray_hwnd:
             user32.SetForegroundWindow(tray_hwnd)
 
         # TPM_LEFTALIGN=0x0, TPM_BOTTOMALIGN=0x20, TPM_RETURNCMD=0x100
         cmd = user32.TrackPopupMenu(
-            hmenu, 0x120,
-            pos.x(), pos.y(),
-            0, tray_hwnd or 0, None,
+            hmenu,
+            0x120,
+            pos.x(),
+            pos.y(),
+            0,
+            tray_hwnd or 0,
+            None,
         )
 
         if tray_hwnd:
@@ -89,7 +96,6 @@ class DesktopDancerTray:
 
         user32.DestroyMenu(hmenu)
 
-        # 根据选择执行对应操作
         if cmd == 1:
             self._on_add_wife()
         elif cmd == 2:
@@ -98,9 +104,10 @@ class DesktopDancerTray:
     @staticmethod
     def _find_qt_tray_hwnd() -> int:
         import ctypes
-        pid   = ctypes.windll.kernel32.GetCurrentProcessId()
+
+        pid = ctypes.windll.kernel32.GetCurrentProcessId()
         found = [0]
-        buf   = ctypes.create_unicode_buffer(256)
+        buf = ctypes.create_unicode_buffer(256)
 
         @ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_size_t, ctypes.c_size_t)
         def _cb(hwnd, _):
