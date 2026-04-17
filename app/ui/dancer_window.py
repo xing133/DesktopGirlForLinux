@@ -88,14 +88,20 @@ class DancerWindow(QWidget):
 
     def _remove_win32_shadow(self) -> None:
         import ctypes
+        hwnd = int(self.winId())
+        dwmapi = ctypes.windll.dwmapi
+        # 1. 关闭 NC 渲染（移除阴影）
         DWMWA_NCRENDERING_POLICY = 2
         DWMNCRP_DISABLED = 1
-        hwnd = int(self.winId())
         val = ctypes.c_int(DWMNCRP_DISABLED)
-        ctypes.windll.dwmapi.DwmSetWindowAttribute(
-            hwnd, DWMWA_NCRENDERING_POLICY,
-            ctypes.byref(val), ctypes.sizeof(val),
-        )
+        dwmapi.DwmSetWindowAttribute(hwnd, DWMWA_NCRENDERING_POLICY,
+                                     ctypes.byref(val), ctypes.sizeof(val))
+        # 2. 关闭 Win11 圆角 + 强调色细边框
+        DWMWA_WINDOW_CORNER_PREFERENCE = 33
+        DWMWCP_DONOTROUND = 1
+        val2 = ctypes.c_int(DWMWCP_DONOTROUND)
+        dwmapi.DwmSetWindowAttribute(hwnd, DWMWA_WINDOW_CORNER_PREFERENCE,
+                                     ctypes.byref(val2), ctypes.sizeof(val2))
 
     # ── painting ──────────────────────────────────────────────────────────────
 
